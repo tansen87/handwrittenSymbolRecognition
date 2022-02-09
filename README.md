@@ -1,7 +1,7 @@
 # -pytorch-
 Handwritten mathematical symbol recognition with PyQt5
 
-Add download model.pth to the require folder and delete (.txt)
+Add download model.pth.txt to the require folder and delete (.txt)
 
 https://wwb.lanzouw.com/i9O0Lzsjuvi
 
