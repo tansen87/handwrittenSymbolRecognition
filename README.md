@@ -13,5 +13,5 @@ https://www.kaggle.com/xainano/handwrittenmathsymbols
 and then
 python train.py for training
 
-python Gui.py to open interface
+python index.py to open interface
 
