@@ -7,4 +7,7 @@ https://wwb.lanzouw.com/i9O0Lzsjuvi
 
 password:a5o6
 
-python Gui.py
+python train.py for training
+
+python Gui.py to open interface
+
