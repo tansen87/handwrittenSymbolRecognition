@@ -6,6 +6,7 @@ from PyQt5.QtGui import QIcon, QColor, QPixmap, QKeySequence
 from PyQt5.QtWidgets import QMainWindow, QPushButton, QLabel, QWidget, QTextEdit, QHBoxLayout, QVBoxLayout, QSplitter, \
     QComboBox, QFileDialog, QApplication, QMessageBox, QShortcut, QMenu
 from matplotlib import pyplot as plt
+from PIL import Image
 
 from require.Paintboard import PaintBoard
 from require import network
@@ -34,10 +35,10 @@ class MainWindow(QMainWindow):
                                 'ctrl+3: 显示图片\n'
                                 'ctrl+4: 程序说明\n'
                                 'ctrl+5: 退出程序', self)
-        self.label_pic.setGeometry(5, 27, 390, 300)  # set position
+        self.label_pic.setGeometry(5, 27, 390, 300)
         self.label_pic.setStyleSheet("QLabel{background:gray;}"
                                      "QLabel{color:rgb(0,0,0,120);font-size:20px;font-weight:bold;font-family:黑体;}"
-                                     )  # set label style
+                                     )
         self.label_pic.setAlignment(QtCore.Qt.AlignCenter)
 
         self.label_mat_pic = QLabel('ctrl+1: 选择图片\n'
@@ -45,10 +46,10 @@ class MainWindow(QMainWindow):
                                     'ctrl+3: 显示图片\n'
                                     'ctrl+4: 程序说明\n'
                                     'ctrl+5: 退出程序', self)
-        self.label_mat_pic.setGeometry(400, 27, 390, 300)  # set position
+        self.label_mat_pic.setGeometry(400, 27, 390, 300)
         self.label_mat_pic.setStyleSheet("QLabel{background:gray;}"
                                          "QLabel{color:rgb(0,0,0,120);font-size:20px;font-weight:bold;font-family:黑体;}"
-                                         )  # set label style
+                                         )
         self.label_mat_pic.setAlignment(QtCore.Qt.AlignCenter)
 
         self.file_menu = QMenu('file', self)
@@ -86,7 +87,7 @@ class MainWindow(QMainWindow):
     def slot_btn_rec(self):
         global file_name, result
         try:
-            image = network.Image.open(file_name).convert('RGB')
+            image = Image.open(file_name).convert('RGB')
         except:
             QMessageBox.information(self, 'error', 'No image!\nif u need help\npress ctrl+4')
         else:
@@ -131,9 +132,9 @@ class MainWindow(QMainWindow):
         self.close()
 
     def slot_btn_write(self):
-        self.hide()  # 隐藏此窗口
-        self.backtrack = write_recognition()  # 将第二个窗口换个名字
-        self.backtrack.show()  # 经第二个窗口显示出来
+        self.hide()
+        self.backtrack = write_recognition()
+        self.backtrack.show()
 
     def btn_close_function(self):
         self.close()
@@ -213,7 +214,7 @@ class write_recognition(QWidget):
         savePath = "./test_img/pic.png"
         image = self.__paintBoard.GetContentAsQImage()
         image.save(savePath)
-        image = network.Image.open(savePath).convert('RGB')
+        image = Image.open(savePath).convert('RGB')
         r_image = network.data_transform(image)
         r_image = network.torch.unsqueeze(r_image, dim=0).float()
         output = network.model(r_image)
