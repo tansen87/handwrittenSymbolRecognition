@@ -1,30 +1,26 @@
 import sys
 
+from PIL import Image
+import matplotlib.pyplot as plt
 from PyQt5 import QtCore, QtGui
 from PyQt5.QtCore import QSize
 from PyQt5.QtGui import QIcon, QColor, QPixmap, QKeySequence
-from PyQt5.QtWidgets import QMainWindow, QPushButton, QLabel, QWidget, QTextEdit, QHBoxLayout, QVBoxLayout, QSplitter, \
-    QComboBox, QFileDialog, QApplication, QMessageBox, QShortcut, QMenu
-from matplotlib import pyplot as plt
-from PIL import Image
+from PyQt5.QtWidgets import (
+    QMainWindow, QPushButton, QLabel, QWidget, QTextEdit, QHBoxLayout, QVBoxLayout,
+    QSplitter, QComboBox, QFileDialog, QApplication, QMessageBox, QShortcut, QMenu)
 
-from require.Paintboard import PaintBoard
 from require import network
+from require.Paintboard import PaintBoard
 
 global file_name, result
 
+
 class MainWindow(QMainWindow):
-    def __init__(self):
+    def __init__(self) -> None:
         super(MainWindow, self).__init__()
-        self.backtrack = None
-        self.exp = None
-        self.help_menu = None
-        self.file_menu = None
-        self.label_mat_pic = None
-        self.label_pic = None
         self.init_ui()
 
-    def init_ui(self):
+    def init_ui(self) -> None:
         self.resize(795, 520)
         # self.setFixedSize(self.width(), self.height())
         self.setWindowTitle('math symbol recognition')
@@ -77,28 +73,27 @@ class MainWindow(QMainWindow):
         self.exp.setGeometry(180, 360, 420, 150)
         self.exp.setStyleSheet("font-size: 40px")
 
-    def slot_btn_open(self):
+    def slot_btn_open(self) -> None:
         global file_name
         imgName, imgType = QFileDialog.getOpenFileName(self, "open image", "", "All Files(*)")
         img = QtGui.QPixmap(imgName).scaled(self.label_pic.width(), self.label_pic.height())
         self.label_pic.setPixmap(img)
         file_name = imgName
 
-    def slot_btn_rec(self):
+    def slot_btn_rec(self) -> None:
         global file_name, result
         try:
             image = Image.open(file_name).convert('RGB')
-        except:
-            QMessageBox.information(self, 'error', 'No image!\nif u need help\npress ctrl+4')
-        else:
             r_image = network.data_transform(image)
             r_image = network.torch.unsqueeze(r_image, dim=0).float()
             output = network.model(r_image)
             pred = output.argmax(dim=1, keepdim=True)
             result = network.symbol_names[int(pred)]
             self.exp.setText(result)
+        except:
+            QMessageBox.information(self, 'error', 'No image!\nif u need help\npress ctrl+4')
 
-    def slot_btn_show(self):
+    def slot_btn_show(self) -> None:
         fig = plt.figure(figsize=(4, 4))
         axes = fig.add_subplot(111)
         axes.set_xticks([])
@@ -109,41 +104,41 @@ class MainWindow(QMainWindow):
         axes.spines['top'].set_color('none')
         try:
             prediction_image = '$' + result + '$'
-        except:
-            QMessageBox.information(self, 'error', 'No image!\nif u need help\npress ctrl+4')
-        else:
             axes.text(0, 0.5, prediction_image, fontsize=20)
             test_pic = './test_img/matplotlib_pic/test.png'
             plt.savefig(test_pic)
             jpg = QtGui.QPixmap(test_pic).scaled(self.label_mat_pic.width(), self.label_mat_pic.height())
             self.label_mat_pic.setPixmap(jpg)
+        except:
+            QMessageBox.information(self, 'error', 'No image!\nif u need help\npress ctrl+4')
 
-    def slot_btn_about(self):
-        QMessageBox.about(self, "about",
-                          "<font size='4' color='pink'>"
-                          "This is a program that recognize handwritten mathematical symbols.<hr>"
-                          "Press Ctrl + 1 to open the picture<br>"
-                          "Press Ctrl + 2 to recognize the picture<br>"
-                          "Press Ctrl + 3 to display the picture<br>"
-                          "Press Ctrl + 5 to exit the program<hr>"
-                          "</font>")
+    def slot_btn_about(self) -> None:
+        QMessageBox.about(
+            self,
+            "about",
+            "<font size='4' color='pink'>"
+            "This is a program that recognize handwritten mathematical symbols.<hr>"
+            "Press Ctrl + 1 to open the picture<br>"
+            "Press Ctrl + 2 to recognize the picture<br>"
+            "Press Ctrl + 3 to display the picture<br>"
+            "Press Ctrl + 5 to exit the program<hr>"
+            "</font>")
 
-    def slot_btn_close(self):
+    def slot_btn_close(self) -> None:
         self.close()
 
-    def slot_btn_write(self):
+    def slot_btn_write(self) -> None:
         self.hide()
         self.backtrack = write_recognition()
         self.backtrack.show()
 
-    def btn_close_function(self):
+    def btn_close_function(self) -> None:
         self.close()
 
 
 class write_recognition(QWidget):
     def __init__(self):
         super(write_recognition, self).__init__()
-        self.backtrack = None
         self.__InitData()
         self.__InitView()
 
@@ -231,12 +226,8 @@ class write_recognition(QWidget):
         self.close()
 
 
-def main():
+if __name__ == '__main__':
     app = QApplication(sys.argv)
     window = MainWindow()
     window.show()
     sys.exit(app.exec())
-
-
-if __name__ == '__main__':
-    main()
