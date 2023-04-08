@@ -1,8 +1,6 @@
 import torch
 import torch.nn as nn
-from torchvision import datasets, transforms
-import torchvision.models as models
-from PIL import Image
+from torchvision import transforms, models
 
 
 class Net(nn.Module):
@@ -14,6 +12,7 @@ class Net(nn.Module):
     def forward(self, x):
         x = self.BackBone(x)
         return x
+
 
 # 初始化模型
 model = Net()
@@ -37,6 +36,7 @@ data_transform = transforms.Compose([
 ])
 dictionaries = ['./require/dictionary.txt']
 
+
 def load_dict(dictFile):
     fp = open(dictFile)
     stuff = fp.readlines()
@@ -46,6 +46,7 @@ def load_dict(dictFile):
         w = dic.strip().split()
         lexicon[w[0]] = int(w[1])
     return lexicon
+
 
 worddicts = load_dict(dictionaries[0])
 worddicts_r = [None] * len(worddicts)
