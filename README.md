@@ -1,11 +1,9 @@
 ### 基于ResNet的手写数学符号识别
-
-usage
-1. [下载](https://wwb.lanzouw.com/i9O0Lzsjuvi)训练好的权重，将下载好的权重`model.pth.txt`去掉`.txt`后缀，然后将`model.pth`放入`require`文件夹中
-password:a5o6
-
-2. 运行 python `index.py`
-
+![image](https://github.com/tansen87/handwrittenSymbolRecognition/assets/98570790/f295e5e7-27c0-45fc-b981-14006e7be686)
+ 运行
+···bash
+python main.py
+```
 自己训练
 1. 如果你想自己训练数据集，可以在[Kaggle](https://www.kaggle.com/xainano/handwrittenmathsymbols)下载数据集
 
