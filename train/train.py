@@ -136,16 +136,21 @@ def main():
     BATCH_SIZE = 128  # 每批处理的数据
     num_works = 7  # 加载数据集用的cpu核数
     pin_memory = True  # 使用内存更快
-    train_loader = torch.utils.data.DataLoader(dataset=train_set, batch_size=BATCH_SIZE, shuffle=True,
-                                               num_workers=num_works,
-                                               pin_memory=pin_memory)
-    test_loader = torch.utils.data.DataLoader(dataset=test_set, batch_size=BATCH_SIZE,
-                                              num_workers=num_works,
-                                              pin_memory=pin_memory)
+    train_loader = torch.utils.data.DataLoader(
+        dataset=train_set,
+        batch_size=BATCH_SIZE,
+        shuffle=True,
+        num_workers=num_works,
+        pin_memory=pin_memory)
+    test_loader = torch.utils.data.DataLoader(
+        dataset=test_set,
+        batch_size=BATCH_SIZE,
+        num_workers=num_works,
+        pin_memory=pin_memory)
     # 初始化网络
     model = Net()
     # 训练轮数
-    epochs = 10
+    epochs = 100
     train(model, device, train_loader, test_loader, epochs)
 
 
