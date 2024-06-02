@@ -1,15 +1,11 @@
+import os
+
+import numpy as np
 import torch
 import torch.nn as nn
-from torchvision import datasets, transforms
-import torch.optim as optim
+from torchvision import datasets, transforms, models
 from torch.utils.tensorboard import SummaryWriter
-import torch.nn.functional as F
-from torchsummary import summary
-import os
-import torchvision.models as models
-import torchvision
-from torchvision.datasets import ImageFolder
-import numpy as np
+
 
 writer = SummaryWriter("./logs/tf-logs")
 
@@ -26,7 +22,6 @@ class Net(nn.Module):
 
 
 def train(model, device, train_loader, test_loader, epochs, lr=0.15, save_dir='./checkpoints'):
-    # 如果采用默认初始化权重，很难train的动
     def init_weights(m):
         if isinstance(m, nn.Linear) or isinstance(m, nn.Conv2d):
             nn.init.xavier_uniform_(m.weight)
@@ -124,8 +119,8 @@ def main():
         transforms.Normalize((0.1307, 0.1307, 0.1307), (0.3081, 0.3081, 0.3081)),
     ])
 
-    # 对"extracted_images"中的数据进行变换，并加载
-    orig_set = ImageFolder("../extracted_images", transform=data_transform)
+    # 对"train_images"中的数据进行变换，并加载 (从kaggle里下载)
+    orig_set = datasets.ImageFolder("../train_images", transform=data_transform)
     print(orig_set.class_to_idx)
     # 获取数据集长度
     n = len(orig_set)
