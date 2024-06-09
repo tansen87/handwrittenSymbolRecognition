@@ -37,8 +37,8 @@ data_transform = transforms.Compose([
 dictionaries = ['./require/dictionary.txt']
 
 
-def load_dict(dictFile):
-    fp = open(dictFile)
+def load_dict(dict_file):
+    fp = open(dict_file)
     stuff = fp.readlines()
     fp.close()
     lexicon = {}
