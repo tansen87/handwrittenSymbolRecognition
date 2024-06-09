@@ -7,7 +7,7 @@ from torchvision import datasets, transforms, models
 from torch.utils.tensorboard import SummaryWriter
 
 
-writer = SummaryWriter("./logs/tf-logs")
+writer = SummaryWriter("./logs")
 
 
 class Net(nn.Module):
@@ -57,20 +57,20 @@ def train(model, device, train_loader, test_loader, epochs, lr=0.15, save_dir='.
             # 每计算十轮，打印一次
             if i % 10 == 0:
                 # 打印此时的epoch轮数，loss值，和学习率
-                print('Train Epoch: {} [{}/{} ({:.0f}%)]\tLoss: {:.6f}\t lr:'.format(
-                    epoch, i * len(data), len(train_loader.dataset),
-                           100. * i / len(train_loader), l), optimizer.state_dict()['param_groups'][0]['lr'])
+                print(f'Train Epoch: {epoch} [{i * len(data)}/{len(train_loader.dataset)} ({100. * i / len(train_loader):.0f}%)]\tLoss: {l:.6f}\t lr: {optimizer.state_dict()["param_groups"][0]["lr"]}')
 
         # 将训练集，测试集上的loss
         # 测试集上的准确率记录下来
         test_loss, acc = test(model, device, test_loader)
         total_loss = total_loss / len(train_loader)
-        writer.add_scalars(
-            'check/Loss', {'Train': total_loss, 'Test': test_loss}, epoch)
+        writer.add_scalars('check/Loss', {'Train': total_loss, 'Test': test_loss}, epoch)
         writer.add_scalar('check/Accuracy', acc, epoch)
 
+        if not os.path.exists(save_dir):
+            os.makedirs(save_dir)
+
         # 保存当前epoch所训练好的模型
-        save_dirs = os.path.join(save_dir, str(epoch) + '.pth')
+        save_dirs = os.path.join(save_dir, f'{epoch + 1}.pth')
         torch.save(model.state_dict(), save_dirs)
 
 
@@ -95,18 +95,16 @@ def test(model, device, test_loader):
             correct += pred.eq(label.view_as(pred)).sum()
 
     # 打印loss，准确度
-    print('\nTest set: Average loss: {:.4f}, Accuracy: {}/{} ({:.0f}%)\n'.format(
-        test_loss / len(test_loader), correct, len(test_loader.dataset),
-        100. * correct / len(test_loader.dataset)))
-    return (test_loss / len(test_loader), 100. *
-            correct / len(test_loader.dataset))
+    print(f'Test set: Average loss: {test_loss / len(test_loader):.4f}, '
+        f'Accuracy: {correct}/{len(test_loader.dataset)} '
+        f'({100. * correct / len(test_loader.dataset):.0f}%)\n')
+    return (test_loss / len(test_loader), 100. * correct / len(test_loader.dataset))
 
 
 def main():
     # 检查是否有可用的gpu，如果没有则使用cpu
     # use_cuda = torch.cuda.is_available()
     # device = torch.device("cuda" if use_cuda else "cpu")
-
     device = torch.device("cuda:0")
 
     # 数据预处理模块
@@ -120,7 +118,7 @@ def main():
     ])
 
     # 对"train_images"中的数据进行变换，并加载 (从kaggle里下载)
-    orig_set = datasets.ImageFolder("../train_images", transform=data_transform)
+    orig_set = datasets.ImageFolder("./train_images", transform=data_transform)
     print(orig_set.class_to_idx)
     # 获取数据集长度
     n = len(orig_set)
@@ -133,8 +131,8 @@ def main():
     test_set = torch.utils.data.Subset(orig_set, n_list[int(n * k):])
 
     # 加载数据集
-    BATCH_SIZE = 128  # 每批处理的数据
-    num_works = 7  # 加载数据集用的cpu核数
+    BATCH_SIZE = 64  # 每批处理的数据
+    num_works = 0  # 加载数据集用的cpu核数
     pin_memory = True  # 使用内存更快
     train_loader = torch.utils.data.DataLoader(
         dataset=train_set,
@@ -150,7 +148,7 @@ def main():
     # 初始化网络
     model = Net()
     # 训练轮数
-    epochs = 100
+    epochs = 20
     train(model, device, train_loader, test_loader, epochs)
 
 
