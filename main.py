@@ -1,3 +1,4 @@
+import os
 import sys
 
 from PIL import Image
@@ -12,7 +13,6 @@ from PyQt5.QtWidgets import (
 from require import network
 from require.Paintboard import PaintBoard
 
-global file_name, result
 
 
 class MainWindow(QMainWindow):
@@ -20,9 +20,12 @@ class MainWindow(QMainWindow):
         super(MainWindow, self).__init__()
         self.init_ui()
 
+        self.file_name = None
+        self.result = None
+
     def init_ui(self) -> None:
         self.resize(795, 520)
-        # self.setFixedSize(self.width(), self.height())
+        self.setFixedSize(self.width(), self.height())
         self.setWindowTitle('math symbol recognition')
         self.setWindowIcon(QIcon('./icon/math.ico'))
 
@@ -32,9 +35,9 @@ class MainWindow(QMainWindow):
                                 'ctrl+4: 程序说明\n'
                                 'ctrl+5: 退出程序', self)
         self.label_pic.setGeometry(5, 27, 390, 300)
-        self.label_pic.setStyleSheet("QLabel{background:gray;}"
-                                     "QLabel{color:rgb(0,0,0,120);font-size:20px;font-weight:bold;font-family:黑体;}"
-                                     )
+        self.label_pic.setStyleSheet(
+            "QLabel{background:gray;}"
+            "QLabel{color:rgb(0,0,0,120);font-size:20px;font-weight:bold;font-family:黑体;}")
         self.label_pic.setAlignment(QtCore.Qt.AlignCenter)
 
         self.label_mat_pic = QLabel('ctrl+1: 选择图片\n'
@@ -43,9 +46,9 @@ class MainWindow(QMainWindow):
                                     'ctrl+4: 程序说明\n'
                                     'ctrl+5: 退出程序', self)
         self.label_mat_pic.setGeometry(400, 27, 390, 300)
-        self.label_mat_pic.setStyleSheet("QLabel{background:gray;}"
-                                         "QLabel{color:rgb(0,0,0,120);font-size:20px;font-weight:bold;font-family:黑体;}"
-                                         )
+        self.label_mat_pic.setStyleSheet(
+            "QLabel{background:gray;}"
+            "QLabel{color:rgb(0,0,0,120);font-size:20px;font-weight:bold;font-family:黑体;}")
         self.label_mat_pic.setAlignment(QtCore.Qt.AlignCenter)
 
         self.file_menu = QMenu('file', self)
@@ -74,24 +77,21 @@ class MainWindow(QMainWindow):
         self.exp.setStyleSheet("font-size: 40px")
 
     def slot_btn_open(self) -> None:
-        global file_name
-        imgName, imgType = QFileDialog.getOpenFileName(self, "open image", "", "All Files(*)")
-        img = QtGui.QPixmap(imgName).scaled(self.label_pic.width(), self.label_pic.height())
+        self.file_name, img_type = QFileDialog.getOpenFileName(self, "open image", "", "All Files(*)")
+        img = QtGui.QPixmap(self.file_name).scaled(self.label_pic.width(), self.label_pic.height())
         self.label_pic.setPixmap(img)
-        file_name = imgName
 
     def slot_btn_rec(self) -> None:
-        global file_name, result
         try:
-            image = Image.open(file_name).convert('RGB')
+            image = Image.open(self.file_name).convert('RGB')
             r_image = network.data_transform(image)
             r_image = network.torch.unsqueeze(r_image, dim=0).float()
             output = network.model(r_image)
             pred = output.argmax(dim=1, keepdim=True)
-            result = network.symbol_names[int(pred)]
-            self.exp.setText(result)
-        except:
-            QMessageBox.information(self, 'error', 'No image!\nif u need help\npress ctrl+4')
+            self.result = network.symbol_names[int(pred)]
+            self.exp.setText(self.result)
+        except Exception as e:
+            QMessageBox.information(self, 'error', f'{repr(e)}')
 
     def slot_btn_show(self) -> None:
         fig = plt.figure(figsize=(4, 4))
@@ -103,14 +103,16 @@ class MainWindow(QMainWindow):
         axes.spines['bottom'].set_color('none')
         axes.spines['top'].set_color('none')
         try:
-            prediction_image = '$' + result + '$'
+            prediction_image = '$' + self.result + '$'
             axes.text(0, 0.5, prediction_image, fontsize=20)
+            if not os.path.exists('./test_img/matplotlib_pic'):
+                os.makedirs('./test_img/matplotlib_pic')
             test_pic = './test_img/matplotlib_pic/test.png'
             plt.savefig(test_pic)
-            jpg = QtGui.QPixmap(test_pic).scaled(self.label_mat_pic.width(), self.label_mat_pic.height())
-            self.label_mat_pic.setPixmap(jpg)
-        except:
-            QMessageBox.information(self, 'error', 'No image!\nif u need help\npress ctrl+4')
+            img = QtGui.QPixmap(test_pic).scaled(self.label_mat_pic.width(), self.label_mat_pic.height())
+            self.label_mat_pic.setPixmap(img)
+        except Exception as e:
+            QMessageBox.information(self, 'error', f'{repr(e)}')
 
     def slot_btn_about(self) -> None:
         QMessageBox.about(
@@ -129,16 +131,16 @@ class MainWindow(QMainWindow):
 
     def slot_btn_write(self) -> None:
         self.hide()
-        self.backtrack = write_recognition()
+        self.backtrack = WriteRecongniton()
         self.backtrack.show()
 
     def btn_close_function(self) -> None:
         self.close()
 
 
-class write_recognition(QWidget):
+class WriteRecongniton(QWidget):
     def __init__(self):
-        super(write_recognition, self).__init__()
+        super(WriteRecongniton, self).__init__()
         self.__InitData()
         self.__InitView()
 
@@ -206,16 +208,18 @@ class write_recognition(QWidget):
         self.__paintBoard.ChangePenThickness(penThickness)
 
     def btn_rec_function(self):
-        savePath = "./test_img/pic.png"
+        if not os.path.exists('./test_img'):
+            os.makedirs('./test_img')
+        save_path = "./test_img/pic.png"
         image = self.__paintBoard.GetContentAsQImage()
-        image.save(savePath)
-        image = Image.open(savePath).convert('RGB')
+        image.save(save_path)
+        image = Image.open(save_path).convert('RGB')
         r_image = network.data_transform(image)
         r_image = network.torch.unsqueeze(r_image, dim=0).float()
         output = network.model(r_image)
         pred = output.argmax(dim=1, keepdim=True)
-        result = network.symbol_names[int(pred)]
-        self.edit.setText(result)
+        self.result = network.symbol_names[int(pred)]
+        self.edit.setText(self.result)
 
     def btn_ret_function(self):
         self.hide()
