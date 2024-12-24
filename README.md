@@ -9,7 +9,7 @@
 
 
 
-### 运行项目
+### 直接运行
 
 1. 安装poetry
 
@@ -33,6 +33,42 @@
 
 ### 自己训练
 
-1. 如果你想自己训练数据集，可以在[Kaggle](https://www.kaggle.com/xainano/handwrittenmathsymbols)下载数据集 (数据集很大，可以把每个分类降至100张图片再来训练)
+1. 在[Kaggle](https://www.kaggle.com/xainano/handwrittenmathsymbols)下载数据集 (数据集很大,可以把每个分类降至100张图片再来训练)
 
-2. 训练 `python train.py`
+2. 如果只训练数字 <u>**0-9**</u> ,修改train.py第17行代码
+
+   ```python
+   self.BackBone.fc = nn.Linear(self.BackBone.fc.in_features, 10)
+   ```
+
+3. 将数据集放在 **train/train_images** ,然后开始训练
+
+   ```cmd
+   python train.py
+   ```
+
+4. 训练完成后,修改 **require/network.py** 第10行代码
+
+   ```python
+   self.BackBone.fc = nn.Linear(self.BackBone.fc.in_features, 10)
+   ```
+
+5. 将训练好的模型拷贝至 **require/** 文件夹内,并重命名为 **model.pth** (训练好的模型在**train/checkpoints/**文件夹)
+
+6. 修改 **require/dictionary.txt**
+
+   ```txt
+   0 0
+   1 1
+   2 2
+   3 3
+   4 4
+   5 5
+   6 6
+   7 7
+   8 8
+   9 9
+   ```
+
+7. 按照**<u>直接运行</u>**的3个步骤来启动项目
+
