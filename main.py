@@ -208,18 +208,21 @@ class WriteRecongniton(QWidget):
         self.__paintBoard.ChangePenThickness(penThickness)
 
     def btn_rec_function(self):
-        if not os.path.exists('./test_img'):
-            os.makedirs('./test_img')
-        save_path = "./test_img/pic.png"
-        image = self.__paintBoard.GetContentAsQImage()
-        image.save(save_path)
-        image = Image.open(save_path).convert('RGB')
-        r_image = network.data_transform(image)
-        r_image = network.torch.unsqueeze(r_image, dim=0).float()
-        output = network.model(r_image)
-        pred = output.argmax(dim=1, keepdim=True)
-        self.result = network.symbol_names[int(pred)]
-        self.edit.setText(self.result)
+        try:
+            if not os.path.exists('./test_img'):
+                os.makedirs('./test_img')
+            save_path = "./test_img/matplotlib_pic/test.png"
+            image = self.__paintBoard.GetContentAsQImage()
+            image.save(save_path)
+            image = Image.open(save_path).convert('RGB')
+            r_image = network.data_transform(image)
+            r_image = network.torch.unsqueeze(r_image, dim=0).float()
+            output = network.model(r_image)
+            pred = output.argmax(dim=1, keepdim=True)
+            self.result = network.symbol_names[int(pred)]
+            self.edit.setText(self.result)
+        except Exception as e:
+            QMessageBox.information(self, 'error', f'{repr(e)}')
 
     def btn_ret_function(self):
         self.hide()
