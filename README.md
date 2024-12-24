@@ -53,7 +53,7 @@
    self.BackBone.fc = nn.Linear(self.BackBone.fc.in_features, 10)
    ```
 
-5. 将训练好的模型拷贝至 **require/** 文件夹内,并重命名为 **model.pth** (训练好的模型在**train/checkpoints/**文件夹)
+5. 将训练好的模型拷贝至 **require/** 文件夹内,并重命名为 **model.pth** (训练好的模型在 **train/checkpoints/** 文件夹)
 
 6. 修改 **require/dictionary.txt**
 
@@ -70,5 +70,5 @@
    9 9
    ```
 
-7. 按照**<u>直接运行</u>**的3个步骤来启动项目
+7. 按照 **<u>直接运行</u>** 的3个步骤来启动项目
 
