@@ -103,9 +103,8 @@ def test(model, device, test_loader):
 
 def main():
     # 检查是否有可用的gpu，如果没有则使用cpu
-    # use_cuda = torch.cuda.is_available()
-    # device = torch.device("cuda" if use_cuda else "cpu")
-    device = torch.device("cuda:0")
+    device = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
+    # device = torch.device("cuda:0")
 
     # 数据预处理模块
     data_transform = transforms.Compose([
@@ -130,25 +129,26 @@ def main():
     train_set = torch.utils.data.Subset(orig_set, n_list[:int(n * k)])
     test_set = torch.utils.data.Subset(orig_set, n_list[int(n * k):])
 
-    # 加载数据集
-    BATCH_SIZE = 64  # 每批处理的数据
+    batch_size = 64  # 每批处理的数据
     num_works = 0  # 加载数据集用的cpu核数
     pin_memory = True  # 使用内存更快
+
+    # 加载数据集
     train_loader = torch.utils.data.DataLoader(
         dataset=train_set,
-        batch_size=BATCH_SIZE,
+        batch_size=batch_size,
         shuffle=True,
         num_workers=num_works,
         pin_memory=pin_memory)
     test_loader = torch.utils.data.DataLoader(
         dataset=test_set,
-        batch_size=BATCH_SIZE,
+        batch_size=batch_size,
         num_workers=num_works,
         pin_memory=pin_memory)
     # 初始化网络
     model = Net()
     # 训练轮数
-    epochs = 20
+    epochs = 10
     train(model, device, train_loader, test_loader, epochs)
 
 
