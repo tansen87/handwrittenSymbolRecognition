@@ -13,19 +13,19 @@
 
 1. 安装poetry
 
-   ```cmd
+   ```shell
    pip install poetry==1.8.5
    ```
 
 2. 使用poetry安装依赖
 
-   ```cmd
+   ```shell
    poetry install
    ```
 
 3. 启动项目
 
-   ```cmd
+   ```shell
    poetry run python main.py
    ```
 
@@ -33,29 +33,41 @@
 
 ### 自己训练
 
-1. 在[Kaggle](https://www.kaggle.com/xainano/handwrittenmathsymbols)下载数据集 (数据集很大,可以把每个分类降至100张图片再来训练)
+1. 安装poetry
 
-2. 如果只训练数字 <u>**0-9**</u> ,修改train.py第17行代码
+   ```shell
+   pip install poetry==1.8.5
+   ```
+
+2. 使用poetry安装依赖
+
+   ```shell
+   poetry install
+   ```
+
+3. 在[Kaggle](https://www.kaggle.com/xainano/handwrittenmathsymbols)下载数据集 (数据集很大,可以把每个分类降至100张图片再来训练)
+
+4. 如果只训练数字 <u>**0-9**</u> ,修改 **train.py** 第17行代码
 
    ```python
    self.BackBone.fc = nn.Linear(self.BackBone.fc.in_features, 10)
    ```
 
-3. 将数据集放在 **train/train_images** ,然后开始训练
+5. 将数据集放在 **train/train_images** ,然后开始训练
 
-   ```cmd
+   ```shell
    python train.py
    ```
 
-4. 训练完成后,修改 **require/network.py** 第10行代码
+6. 训练完成后,修改 **require/network.py** 第10行代码
 
    ```python
    self.BackBone.fc = nn.Linear(self.BackBone.fc.in_features, 10)
    ```
 
-5. 将训练好的模型拷贝至 **require/** 文件夹内,并重命名为 **model.pth** (训练好的模型在**train/checkpoints/**文件夹)
+7. 将训练好的模型拷贝至 **require/** 文件夹内,并重命名为 **model.pth** (训练好的模型在**train/checkpoints/**文件夹)
 
-6. 修改 **require/dictionary.txt**
+8. 修改 **require/dictionary.txt**
 
    ```txt
    0 0
@@ -70,5 +82,8 @@
    9 9
    ```
 
-7. 按照**<u>直接运行</u>**的3个步骤来启动项目
+9. 启动项目
 
+   ```shell
+   poetry run python main.py
+   ```
